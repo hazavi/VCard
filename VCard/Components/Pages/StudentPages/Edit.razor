@@ -1,0 +1,101 @@
+﻿@page "/Students/edit"
+@inject VCard.Data.StudentDbContext DB
+@using VCard.Model
+@inject NavigationManager NavigationManager
+@using Microsoft.EntityFrameworkCore
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h4>Student</h4>
+<hr />
+@if (Student is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Student" OnValidSubmit="UpdateStudent" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <input type="hidden" name="Student.Id" value="@Student.Id" />
+                <div class="mb-3">
+                    <label for="name" class="form-label">Name:</label>
+                    <InputText id="name" @bind-Value="Student.Name" class="form-control" />
+                    <ValidationMessage For="() => Student.Name" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="birthdate" class="form-label">Birthdate:</label>
+                    <InputDate id="birthdate" @bind-Value="Student.Birthdate" class="form-control" />
+                    <ValidationMessage For="() => Student.Birthdate" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="gender" class="form-label">Gender:</label>
+                    <InputText id="gender" @bind-Value="Student.Gender" class="form-control" />
+                    <ValidationMessage For="() => Student.Gender" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="pictureurl" class="form-label">PictureUrl:</label>
+                    <InputText id="pictureurl" @bind-Value="Student.PictureUrl" class="form-control" />
+                    <ValidationMessage For="() => Student.PictureUrl" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/students">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    public int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    public Student? Student { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Student ??= await DB.Students.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (Student is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more details, see https://aka.ms/RazorPagesCRUD.
+    public async Task UpdateStudent()
+    {
+        DB.Attach(Student!).State = EntityState.Modified;
+
+        try
+        {
+            await DB.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!StudentExists(Student!.Id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/students");
+    }
+
+    bool StudentExists(int id)
+    {
+        return DB.Students.Any(e => e.Id == id);
+    }
+}

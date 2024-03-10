@@ -1,0 +1,25 @@
+﻿@page "/students"
+@using Microsoft.AspNetCore.Components.QuickGrid
+@inject VCard.Data.StudentDbContext DB
+@using VCard.Model
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="students/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="DB.Students">
+    <PropertyColumn Property="student => student.Name" />
+    <PropertyColumn Property="student => student.Birthdate" />
+    <PropertyColumn Property="student => student.Gender" />
+    <PropertyColumn Property="student => student.PictureUrl" />
+
+    <TemplateColumn Context="student">
+        <a href="@($"students/edit?id={student.Id}")">Edit</a> |
+        <a href="@($"students/details?id={student.Id}")">Details</a> |
+        <a href="@($"students/delete?id={student.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
