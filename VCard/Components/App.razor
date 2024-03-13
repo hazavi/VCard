@@ -15,6 +15,22 @@
 <body>
     <Routes />
     <script src="_framework/blazor.web.js"></script>
+
+    <script>
+        function getImageDimensions(file, dotNetReference) {
+            var reader = new FileReader();
+            reader.onload = function (event) {
+                var img = new Image();
+                img.onload = function () {
+                    dotNetReference.invokeMethodAsync('ReceiveImageDimensions', this.width, this.height);
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+    </script>
+
 </body>
 
 </html>

@@ -35,7 +35,7 @@
         </dl>
         <EditForm method="post" Model="student" OnValidSubmit="DeleteStudent" FormName="delete" Enhance>
             <button type="submit" class="btn btn-danger" disabled="@(student is null)">Delete</button> |
-            <a href="/students">Back to List</a>
+            <a href="/">Back to List</a>
         </EditForm>
     }
 </div>
@@ -60,6 +60,6 @@
     {
         DB.Students.Remove(student!);
         await DB.SaveChangesAsync();
-        NavigationManager.NavigateTo("/students");
+        NavigationManager.NavigateTo("/");
     }
 }

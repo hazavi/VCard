@@ -1,4 +1,4 @@
-﻿@page "/students"
+﻿@page "/"
 @using Microsoft.AspNetCore.Components.QuickGrid
 @inject VCard.Data.StudentDbContext DB
 @using VCard.Model
@@ -15,7 +15,6 @@
     <PropertyColumn Property="student => student.Name" />
     <PropertyColumn Property="student => student.Birthdate" />
     <PropertyColumn Property="student => student.Gender" />
-    <PropertyColumn Property="student => student.PictureUrl" />
 
     <TemplateColumn Context="student">
         <a href="@($"students/edit?id={student.Id}")">Edit</a> |

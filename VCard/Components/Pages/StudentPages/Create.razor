@@ -2,6 +2,8 @@
 @inject VCard.Data.StudentDbContext DB
 @using VCard.Model
 @inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+@inject IJSRuntime JSRuntime
 
 <PageTitle>Create</PageTitle>
 
@@ -28,31 +30,64 @@
                 <label for="gender" class="form-label">Gender:</label> 
                 <InputText id="gender" @bind-Value="Student.Gender" class="form-control" /> 
                 <ValidationMessage For="() => Student.Gender" class="text-danger" /> 
-            </div>        
+            </div>
             <div class="mb-3">
-                <label for="pictureurl" class="form-label">PictureUrl:</label> 
-                <InputText id="pictureurl" @bind-Value="Student.PictureUrl" class="form-control" /> 
-                <ValidationMessage For="() => Student.PictureUrl" class="text-danger" /> 
-            </div>        
+                <label for="picture" class="form-label">Picture:</label>
+                <InputFile id="picture" OnChange="OnInputFileChange" class="form-control" />
+                <ValidationMessage For="() => Student.PictureUrl" class="text-danger" />
+            </div>
+
+            @if (!string.IsNullOrEmpty(Student.PictureUrl))
+            {
+                <div class="mb-3">
+                    <label>Selected Picture:</label>
+                    <br />
+                    <img src="@Student.PictureUrl" alt="Selected Picture" style="max-width: 200px; max-height: 200px;" />
+                </div>
+            }
+
+
             <button type="submit" class="btn btn-primary">Create</button>
         </EditForm>
     </div>
 </div>
 
 <div>
-    <a href="/students">Back to List</a>
+    <a href="/">Back to List</a>
 </div>
+
 
 @code {
 
     [SupplyParameterFromForm]
     public Student Student { get; set; } = new();
 
-    // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
+    private string base64String;
+    private string ErrorMessage { get; set; }
+    private IBrowserFile? selectedFile;
+
+    private string imageBase64;
+
+    private async Task OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        var file = e.File; // Assuming you're only allowing a single file, adjust as necessary
+        if (file != null)
+        {
+            using var memoryStream = new MemoryStream();
+            await file.OpenReadStream().CopyToAsync(memoryStream);
+            imageBase64 = $"data:image/png;base64,{Convert.ToBase64String(memoryStream.ToArray())}";
+
+            Student.PictureUrl = imageBase64;
+        }
+    }
+
+
+
     public async Task AddStudent()
     {
         DB.Students.Add(Student);
         await DB.SaveChangesAsync();
-        NavigationManager.NavigateTo("/students");
+        NavigationManager.NavigateTo("/");
     }
+
 }
